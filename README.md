@@ -2,17 +2,17 @@
 The R script PairwiseDifferencesToROC.R aims at deriving pairwise differences of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) into a long dataframe with the objective to perform a receiving operating curve (ROC) analysis assessing the threshold of pairwise differences presenting the best combination of sensitivity and specificity to distinguish between samples related and unrelated to a studied outbreak.
 # Input paiwise differences (i.e. PairwiseDifferences.csv)
 ```
-    A  B  C  D  E  F  G  H  I  J
-1   0  2  4  5  6  5 45 84 65 12
-2   2  0  7  4  5 15 24 23  5 11
-3   4  7  0  4 15 17 18 19 24 26
-4   5  4  4  0 20 45 64 78 25 34
-5   6  5 15 20  0 12 78 46 54  4
-6   5 15 17 45 12  0 30 67  8 16
-7  45 24 18 64 78 30  0 50 24 12
-8  84 23 19 78 46 67 50  0 60 50
-9  65  5 24 25 54  8 24 60  0 70
-10 12 11 26 34  4 16 12 50 70  0
+sample	A	B	C	D	E	F	G	H	I	J
+A	0	2	4	5	6	5	45	84	65	12
+B	2	0	7	4	5	15	24	23	5	11
+C	4	7	0	4	15	17	18	19	24	26
+D	5	4	4	0	20	45	64	78	25	34
+E	6	5	15	20	0	12	78	46	54	4
+F	5	15	17	45	12	0	30	67	8	16
+G	45	24	18	64	78	30	0	50	24	12
+H	84	23	19	78	46	67	50	0	60	50
+I	65	5	24	25	54	8	24	60	0	70
+J	12	11	26	34	4	16	12	50	70	0
 ```
 # Dependencies
 The R script PairwiseDifferencesToROC.R was prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
