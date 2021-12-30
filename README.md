@@ -1,6 +1,6 @@
 # Usage
 The R script PairwiseDifferencesToROC.R aims at deriving pairwise differences of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) into a long dataframe with the objective to perform a receiving operating curve (ROC) analysis assessing the threshold of pairwise differences presenting the best combination of sensitivity and specificity to distinguish between samples related and unrelated to a studied outbreak.
-# Input paiwise differences (i.e. PairwiseDifferences.csv)
+# Input pairwise differences (i.e. PairwiseDifferences.csv)
 ```
 sample	A	B	C	D	E	F	G	H	I	J
 A	0	2	4	5	6	5	45	84	65	12
