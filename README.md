@@ -65,7 +65,7 @@ install.packages(missing_packages$Package)
 ```
 # Start
 ```
-rstudio PairwiseDifferencesToROC
+rstudio PairwiseDifferencesToROC.R
 ```
 # Illustration
 ![ROC figure](https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC/blob/main/illustration.png)
