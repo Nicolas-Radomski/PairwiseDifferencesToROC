@@ -17,7 +17,7 @@ sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
    S11 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
    S12 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
 ```
-## Positive (PC) and negative controls (NC) related to the investigated outbreak (i.e. Controls.csv)
+## Positive (PC) and negative controls (NC) of the outbreak (i.e. Controls.csv)
 ```
 sample	control
     S1	     PC
