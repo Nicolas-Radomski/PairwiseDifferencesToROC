@@ -106,7 +106,7 @@ sudo apt update
 sudo apt install r-base
 R --version
 ```
-## 2/ Install RStudio (from dowloaded rstudio-1.3.1093-amd64.deb)
+## 2/ Install RStudio (from dowloaded rstudio-2021.09.1-372-amd64.deb)
 ```
 sudo apt install gdebi-core
 sudo gdebi /home/Downloads/rstudio-2021.09.1-372-amd64.deb
