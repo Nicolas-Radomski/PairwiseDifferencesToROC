@@ -1,5 +1,5 @@
 # Usage
-The R script PairwiseDifferencesToROC.R aims at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a receiving operating curve (ROC) analysis (ROC.pdf) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
+The R script PairwiseDifferencesToROC.R aims at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a Receiver Operating Characteristic (ROC) analysis (ROC.pdf) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
 # Input
 ## Profiles of microbial mutations (i.e. Profiles.csv)
 ```

@@ -1,4 +1,4 @@
-#### profiles of microbial mutations to Receiving Operating Curve (ROC) analysis ####
+#### profiles of microbial mutations to Receiver Operating Characteristic (ROC) analysis ####
 
 # installation of packages
 
@@ -483,7 +483,7 @@ comment <- scan(what="character")
 
 rm(comment)
 
-# perform a receiving operating curve (ROC) analysis from the dataframe of pairwise differences
+# perform a Receiver Operating Characteristic (ROC) analysis from the dataframe of pairwise differences
 
 ## suppose that the samples S1, S2, S3, S4, S5, S6 and S7 are positive controls (PC) of an outbreak
 ## suppose that samples S8, S9, S10, S11 and S12 are negative controls (NC) of an outbreak
