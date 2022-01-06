@@ -150,10 +150,14 @@ install.packages(missing_packages$Package)
 # Start
 ## Launching each command from Rstudio
 ```
+git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
+cd PairwiseDifferencesToROC
 rstudio PairwiseDifferences2ROC.R
 ```
 ## Launching the whole script from Rscript
 ```
+git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
+cd PairwiseDifferencesToROC
 Rscript PairwiseDifferencesToROC.R Profiles.csv Controls.csv
 ```
 # Illustration
