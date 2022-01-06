@@ -68,7 +68,7 @@ S11  S1    12     NC     PC unrelated
 S12  S1    13     NC     PC unrelated
 ...
 ```
-## Area under the curve (AUC) of the ROC analysis (i.e. ROC.pdf and MetricsROC.txt)
+## ROC analysis and related metrics (i.e. ROC.pdf and MetricsROC.txt)
 ```
 Working directory path: /home/IZSNT/n.radomski/Downloads/PairwiseDifferencesToROC-main 
 First argument: Profiles.csv 
