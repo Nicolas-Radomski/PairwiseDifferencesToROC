@@ -100,7 +100,7 @@ dfl$status <-
                        ifelse((dfl$newcol == "PC") & (dfl$newrow == "NC"), "unrelated", "error"))))
 
 ### export the dataframe into a csv file
-write.csv(dfl,file="Dataframe.csv")
+write.csv(dfl,file="PairwiseDataframe.csv")
 ### subset
 dflsub <- subset(dfl,dfl$status %in% c("related","unrelated"))
 
