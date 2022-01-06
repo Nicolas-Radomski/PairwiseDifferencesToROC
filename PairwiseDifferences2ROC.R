@@ -718,9 +718,6 @@ dev.off()
 sink("MetricsROC.txt")
 ### print working directory path
 cat("Working directory path:",getwd(),"\n")
-### print arguments
-cat("First argument:",args[1],"\n")
-cat("Second argument:",args[2],"\n")
 ### area under the curve of raw data (i.e. 85.34%)
 auc(ROC)
 ### variance (i.e. 11.34112)
