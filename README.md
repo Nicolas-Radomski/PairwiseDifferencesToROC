@@ -168,6 +168,6 @@ Rscript PairwiseDifferencesToROC.R Profiles.csv Controls.csv
 - Robin X., Turck N., Hainard A., Tiberti N., Lisacek F., Sanchez J.C., Müller M., Siegert S., Doering M. and Billings Z. pROC: Display and Analyze ROC Curves. 2021, cran.r-project.org, Version 1.18.0
 - Robin, X., Turck, N., Hainard, A. et al. pROC: an open-source package for R and S+ to analyze and compare ROC curves. 2011, BMC Bioinformatics, 12(77): 1-8
 # Acknowledgment
-Adriano Di Pasquale for our discussion about algorithmic approaches
+Adriano Di Pasquale for our discussions about algorithmic approaches
 # Author
 Nicolas Radomski
