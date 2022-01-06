@@ -148,13 +148,13 @@ missing_packages <- as.data.frame(old_packages[!old_packages[, "Package"] %in% n
 install.packages(missing_packages$Package)
 ```
 # Start
-## Launching each command from Rstudio
+## Launching each command from Rstudio (i.e. detailed algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
 rstudio PairwiseDifferences2ROC.R
 ```
-## Launching the whole script from Rscript
+## Launching the whole script from Rscript (i.e. automatic algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
