@@ -761,3 +761,6 @@ rm(comment)
 
 ## export the best threshold into a csv file
 write.csv(best,file="ThresholdBest.csv")
+
+# add a message
+print("Developped by Nicolas Radomski on January 06 (2022) with the R version 4.1.2 (2021-11-01)")
