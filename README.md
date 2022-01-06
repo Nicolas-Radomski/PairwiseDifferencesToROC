@@ -1,5 +1,5 @@
 # Usage
-The R script PairwiseDifferencesToROC.R aims at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a Receiver Operating Characteristic (ROC) analysis (ROC.pdf) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
+The R scripts PairwiseDifferences2ROC.R and PairwiseDifferencesToROC.R aims at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a Receiver Operating Characteristic (ROC) analysis (ROC.pdf and MetricsROC.txt) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
 # Input
 ## Profiles of microbial mutations (i.e. Profiles.csv)
 ```
@@ -68,9 +68,13 @@ S11  S1    12     NC     PC unrelated
 S12  S1    13     NC     PC unrelated
 ...
 ```
-## Area under the curve (AUC) of the ROC analysis (i.e. ROC.pdf)
+## Area under the curve (AUC) of the ROC analysis (i.e. ROC.pdf and MetricsROC.txt)
 ```
+Working directory path: /home/IZSNT/n.radomski/Downloads/PairwiseDifferencesToROC-main 
+First argument: Profiles.csv 
+Second argument: Controls.csv 
 Area under the curve: 85.34%
+Variance: 11.34
 ```
 ## Sentitivity and specificity of thresholds (i.e. Thresholds.csv)
 ```
@@ -96,6 +100,7 @@ threshold sensitivity specificity
 ```
 # Dependencies
 The R script PairwiseDifferencesToROC.R was prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
+- library(ape)
 - library(data.table)
 - library(spaa)
 - library(pROC)
@@ -143,8 +148,13 @@ missing_packages <- as.data.frame(old_packages[!old_packages[, "Package"] %in% n
 install.packages(missing_packages$Package)
 ```
 # Start
+## Launching each command from Rstudio
 ```
-rstudio PairwiseDifferencesToROC.R
+rstudio PairwiseDifferences2ROC.R
+```
+## Launching the whole script from Rscript
+```
+Rscript PairwiseDifferencesToROC.R Profiles.csv Controls.csv
 ```
 # Illustration
 ![ROC figure](https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC/blob/main/illustration.png)
