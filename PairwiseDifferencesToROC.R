@@ -27,7 +27,7 @@ if (length(args)!=2) {
   stop("Please, provide a first cvs file of profiles and a second csv file of controls\n
        USAGE: Rscript PairwiseDifferencesToROC.R Profiles.csv Controls.csv", call.=FALSE)
 }
-# read first input argument (ape)
+# read the first input argument (i.e. Profiles.csv)
 ## read dataframe of profiles (i.e. Profiles.csv)
 ## S stands for sample (i.e. rows): n = 12
 ## L stands for locus (i.e. columns): n = 15
@@ -71,8 +71,8 @@ dfl = dist2list(distobj)
 ## suppose that the samples S1, S2, S3, S4, S5, S6 and S7 are positive controls (PC) of an outbreak
 ## suppose that samples S8, S9, S10, S11 and S12 are negative controls (NC) of an outbreak
 ## complete the file Controls.csv
-## prepare a dataframe of positive controls (PC)
-### read second input argument (ape)
+## prepare dataframes of positive (PC) and negative (NC) controls
+### read the second input argument (i.e. Controls.csv)
 dfc <- read.table(args[2], dec = ".", header=TRUE, sep = ",", quote = "")
 ### subset PC
 dfPC <- subset(dfc,dfc$control %in% c("PC"))

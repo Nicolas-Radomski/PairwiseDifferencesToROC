@@ -505,8 +505,8 @@ S12	NC
 
 rm(comment)
 
-## prepare a dataframe of positive controls (PC)
-### read dataframe of controls
+## prepare dataframes of positive (PC) and negative (NC) controls
+### read the dataframe of controls
 dfc <- read.table("Controls.csv", dec = ".", header=TRUE, sep = ",", quote = "")
 ### subset PC
 dfPC <- subset(dfc,dfc$control %in% c("PC"))
