@@ -98,12 +98,6 @@ threshold sensitivity specificity
 threshold sensitivity specificity
       9.5          80     75.5102
 ```
-# Dependencies
-The R script PairwiseDifferencesToROC.R was prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
-- library(ape)
-- library(data.table)
-- library(spaa)
-- library(pROC)
 # Install R and Rstudio
 ## 1/ Install R (from configured sources)
 ```
@@ -148,6 +142,14 @@ missing_packages <- as.data.frame(old_packages[!old_packages[, "Package"] %in% n
 install.packages(missing_packages$Package)
 ```
 # Start
+## Install dependencies from the R console
+The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) were prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
+```
+install.packages("ape")
+install.packages("data.table")
+install.packages("spaa")
+install.packages("pROC")
+```
 ## Launching each command from Rstudio (i.e. detailed algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
