@@ -56,7 +56,7 @@ mat <- matrix(v, nrow = (ncol(tdfp)-1) , ncol = (ncol(tdfp)-1), byrow = TRUE)
 sample = dfp$sample
 #### add sample names to matrix rows
 rownames(mat) <- sample
-#### add sample names to matrix rows
+#### add sample names to matrix columns
 colnames(mat) <- sample
 ### export the matrix into a csv file
 write.csv(mat,file="PairwiseMatrix.csv")

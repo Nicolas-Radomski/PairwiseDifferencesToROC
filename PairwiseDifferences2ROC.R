@@ -271,7 +271,7 @@ mat <- matrix(v, nrow = (ncol(tdfp)-1) , ncol = (ncol(tdfp)-1), byrow = TRUE)
 sample = dfp$sample
 #### add sample names to matrix rows
 rownames(mat) <- sample
-#### add sample names to matrix rows
+#### add sample names to matrix columns
 colnames(mat) <- sample
 ### check class (i.e. [1] "matrix" "array")
 class(mat)
