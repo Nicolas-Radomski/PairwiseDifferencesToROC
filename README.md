@@ -153,11 +153,11 @@ install.packages("data.table")
 install.packages("spaa")
 install.packages("pROC")
 ```
-## Launch each command from Rstudio (i.e. PairwiseDifferencesToROC.R detailed algorithm)
+## Launch each command from Rstudio (i.e. PairwiseDifferences2ROC.R detailed algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
-cd PairwiseDifferences2ROC
-rstudio PairwiseDifferencesToROC.R
+cd PairwiseDifferencesToROC
+rstudio PairwiseDifferences2ROC.R
 ```
 ## Launch the whole script from Rscript (i.e. PairwiseDifferencesToROC.R automatic algorithm)
 ```
