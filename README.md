@@ -156,7 +156,7 @@ install.packages("pROC")
 ## Launch each command from Rstudio (i.e. detailed algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
-cd PairwiseDifferencesToROC
+cd PairwiseDifferences2ROC
 rstudio PairwiseDifferences2ROC.R
 ```
 ## Launch the whole script from Rscript (i.e. automatic algorithm)
