@@ -26,7 +26,7 @@ setwd("/PATH/TO/RstudioWorkingDirectory")
 ## A stands for allele (i.e. data): n= 180
 dfp = read.table("Profiles.csv", dec = ".", header=TRUE, sep = ",", quote = "")
 
-## make sure that each variable of the dataframe is characters
+## make sure that each variable of the dataframe is a character
 dfp = data.frame(lapply(dfp, as.character))
 
 ## check nature of variables (must be character for each variable)
@@ -514,11 +514,11 @@ dfPC <- subset(dfc,dfc$control %in% c("PC"))
 dfNC <- subset(dfc,dfc$control %in% c("NC"))
 
 ## derive variables "col" and "row" into variables "new col" and "new row" flagging positive (PC) and negative (NC) controls
-### derivation of "col"
+### derivation of the "col" column
 dfl$newcol <- ifelse(dfl$col %in% dfPC$sample, "PC",
                      ifelse(dfl$col %in% dfNC$sample, "NC",
                             "error"))
-### derivation of "col"
+### derivation of the "row" column
 dfl$newrow <- ifelse(dfl$row %in% dfPC$sample, "PC",
                      ifelse(dfl$row %in% dfNC$sample, "NC",
                             "error"))
