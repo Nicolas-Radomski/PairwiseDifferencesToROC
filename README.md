@@ -2,6 +2,9 @@
 The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) aim at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a Receiver Operating Characteristic (ROC) analysis (ROC.pdf and MetricsROC.txt) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
 # Input
 ## Profiles of microbial mutations (i.e. Profiles.csv)
+- S stands for sample
+- L stands for locus
+- A stands for allele
 ```
 sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
     S1 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
