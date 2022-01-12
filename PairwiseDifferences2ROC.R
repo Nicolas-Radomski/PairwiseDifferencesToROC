@@ -692,7 +692,7 @@ write.csv(dfl,file="PairwiseDataframe.csv")
 
 ### subset
 dflsub <- subset(dfl,dfl$status %in% c("related","unrelated"))
-## check dimension (i.e. [1] 95  6)
+## check dimension (i.e. [1] 119  6)
 dim(dflsub)
 
 ## run a ROC analysis and plot
