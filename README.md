@@ -32,7 +32,7 @@ sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
 ```
 ## Positive (PC) and negative (NC) controls of the outbreak, as well as tested samples (TS) (i.e. Types.csv)
 ```
-	Sample	Control
+	Sample	Type
 	S1	PC
 	S2	PC
 	S3	PC
@@ -101,7 +101,7 @@ FirstSample SecondSample Differences FirstFlag SecondFlag    Status
 ```
 Working directory path: /home/IZSNT/n.radomski/Downloads/PairwiseDifferencesToROC-main 
 First argument: Profiles.csv 
-Second argument: Controls.csv 
+Second argument: Types.csv 
 Area under the curve: 85.34%
 Variance: 11.34
 ```
@@ -204,7 +204,7 @@ rstudio PairwiseDifferences2ROC.R
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
-Rscript PairwiseDifferencesToROC.R Profiles.csv Controls.csv
+Rscript PairwiseDifferencesToROC.R Profiles.csv Types.csv
 ```
 # Illustration
 ![ROC figure](https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC/blob/main/illustration.png)
