@@ -1,5 +1,7 @@
 # Usage
-The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) aim at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform a Receiver Operating Characteristic (ROC) analysis (ROC.pdf and MetricsROC.txt) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Controls.csv) and unrelated (i.e. negative controls NC in Controls.csv) to a studied outbreak.
+The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) aim at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform:
+- a Receiver Operating Characteristic (ROC) analysis (ROC.pdf and MetricsROC.txt) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Types.csv) and unrelated (i.e. negative controls NC in Types.csv) to a studied outbreak
+- predictions of samples based on the best ROC threshold (i.e. tested samples TS in Types.csv) with regard their involment in the investigated outbreak (Predictions.csv).
 # Input
 ## Profiles of microbial mutations (i.e. Profiles.csv)
 - S stands for sample
@@ -19,56 +21,80 @@ sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
    S10 A50 A22 A50 A22 A55 A51 A27 A50  A27  A66 A66  A8 A97 A54 A47
    S11 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
    S12 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
+   S13 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A87 A54 A47
+   S14 A41 A15 A41 A12 A30 A41 A24 A41  A12  A55 A66  A8 A97 A54 A47
+   S15 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
+   S16 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
+   S17 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A87 A54 A47
+   S18 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
+   S19 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
+   S20 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
 ```
-## Positive (PC) and negative (NC) controls of the outbreak (i.e. Controls.csv)
+## Positive (PC) and negative (NC) controls of the outbreak, as well as tested samples (TS) (i.e. Types.csv)
 ```
-sample	control
-    S1	     PC
-    S2	     PC
-    S3	     PC
-    S4	     PC
-    S5	     PC
-    S6	     PC
-    S7	     PC
-    S8	     NC
-    S9	     NC
-   S10	     NC
-   S11	     NC
-   S12	     NC
+	Sample	Control
+	S1	PC
+	S2	PC
+	S3	PC
+	S4	PC
+	S5	PC
+	S6	PC
+	S7	PC
+	S8	NC
+	S9	NC
+	S10	NC
+	S11	NC
+	S12	NC
+	S13	TS
+	S14	TS
+	S15	TS
+	S16	TS
+	S17	TS
+	S18	TS
+	S19	TS
+	S20	TS
 ```
 
 # Output
 ## Matrix of pairwise differences of microbial mutations (i.e. PairwiseMatrix.csv)
 ```
-    S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 S11 S12
-S1   0  2  1  5  5  5 11 11  6  12  12  13
-S2   2  0  1  5  6  6 12 12  6  12  14  14
-S3   1  1  0  6  6  6 11 11  6  12  13  13
-S4   5  5  6  0  1  9 12 12 10  12  13  14
-S5   5  6  6  1  0  8 12 12 10  12  13  14
-S6   5  6  6  9  8  0 12 12  6  12  12  13
-S7  11 12 11 12 12 12  0  0  8   8  13  13
-S8  11 12 11 12 12 12  0  0  8   8  13  13
-S9   6  6  6 10 10  6  8  8  0  10  14  13
-S10 12 12 12 12 12 12  8  8 10   0  14  13
-S11 12 14 13 13 13 12 13 13 14  14   0   4
-S12 13 14 13 14 14 13 13 13 13  13   4   0
+    S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 S11 S12 S13 S14 S15 S16 S17 S18 S19 S20
+S1   0  2  1  5  5  5 11 11  6  12  12  13   2   6   0  12   5  11  11  13
+S2   2  0  1  5  6  6 12 12  6  12  14  14   0   6   2  14   5  12  12  14
+S3   1  1  0  6  6  6 11 11  6  12  13  13   1   6   1  13   6  11  11  13
+S4   5  5  6  0  1  9 12 12 10  12  13  14   5  10   5  13   0  12  12  14
+S5   5  6  6  1  0  8 12 12 10  12  13  14   6  10   5  13   1  12  12  14
+S6   5  6  6  9  8  0 12 12  6  12  12  13   6   6   5  12   9  12  12  13
+S7  11 12 11 12 12 12  0  0  8   8  13  13  12   8  11  13  12   0   0  13
+S8  11 12 11 12 12 12  0  0  8   8  13  13  12   8  11  13  12   0   0  13
+S9   6  6  6 10 10  6  8  8  0  10  14  13   6   0   6  14  10   8   8  13
+S10 12 12 12 12 12 12  8  8 10   0  14  13  12  10  12  14  12   8   8  13
+S11 12 14 13 13 13 12 13 13 14  14   0   4  14  14  12   0  13  13  13   4
+S12 13 14 13 14 14 13 13 13 13  13   4   0  14  13  13   4  14  13  13   0
+S13  2  0  1  5  6  6 12 12  6  12  14  14   0   6   2  14   5  12  12  14
+S14  6  6  6 10 10  6  8  8  0  10  14  13   6   0   6  14  10   8   8  13
+S15  0  2  1  5  5  5 11 11  6  12  12  13   2   6   0  12   5  11  11  13
+S16 12 14 13 13 13 12 13 13 14  14   0   4  14  14  12   0  13  13  13   4
+S17  5  5  6  0  1  9 12 12 10  12  13  14   5  10   5  13   0  12  12  14
+S18 11 12 11 12 12 12  0  0  8   8  13  13  12   8  11  13  12   0   0  13
+S19 11 12 11 12 12 12  0  0  8   8  13  13  12   8  11  13  12   0   0  13
+S20 13 14 13 14 14 13 13 13 13  13   4   0  14  13  13   4  14  13  13   0
 ```
 ## Dataframe of pairwise differences of microbial mutations (i.e. PairwiseDataframe.csv)
 ```
-col row value newcol newrow    status
- S1  S1     0     PC     PC   related
- S2  S1     2     PC     PC   related
- S3  S1     1     PC     PC   related
- S4  S1     5     PC     PC   related
- S5  S1     5     PC     PC   related
- S6  S1     5     PC     PC   related
- S7  S1    11     PC     PC   related
- S8  S1    11     NC     PC unrelated
- S9  S1     6     NC     PC unrelated
-S10  S1    12     NC     PC unrelated
-S11  S1    12     NC     PC unrelated
-S12  S1    13     NC     PC unrelated
+FirstSample SecondSample Differences FirstFlag SecondFlag    Status
+         S1           S1           0        PC         PC   related
+         S2           S1           2        PC         PC   related
+         S3           S1           1        PC         PC   related
+         S4           S1           5        PC         PC   related
+         S5           S1           5        PC         PC   related
+         S6           S1           5        PC         PC   related
+         S7           S1          11        PC         PC   related
+         S8           S1          11        NC         PC unrelated
+         S9           S1           6        NC         PC unrelated
+        S10           S1          12        NC         PC unrelated
+        S11           S1          12        NC         PC unrelated
+        S12           S1          13        NC         PC unrelated
 ...
 ```
 ## ROC analysis and related metrics (i.e. ROC.pdf and MetricsROC.txt)
@@ -101,6 +127,20 @@ threshold sensitivity specificity
 threshold sensitivity specificity
       9.5          80     75.5102
 ```
+
+## Prediction about the tested samples (i.e. Predictions.csv)
+```
+TestedSample LowerThreshold HigherThreshold ProportionLower ProportionHigher            Prediction
+         S13              6               1            85.7             14.3   potentially related
+         S14              5               2            71.4             28.6 potentially unrelated
+         S15              6               1            85.7             14.3   potentially related
+         S16              0               7             0.0            100.0    probably unrelated
+         S17              6               1            85.7             14.3   potentially related
+         S18              1               6            14.3             85.7 potentially unrelated
+         S19              1               6            14.3             85.7 potentially unrelated
+         S20              0               7             0.0            100.0    probably unrelated
+```
+
 # Install R and Rstudio
 ## 1/ Install R (from configured sources)
 ```
@@ -152,6 +192,7 @@ install.packages("ape")
 install.packages("data.table")
 install.packages("spaa")
 install.packages("pROC")
+install.packages("plyr")
 ```
 ## Launch each command from Rstudio (i.e. PairwiseDifferences2ROC.R detailed algorithm)
 ```
