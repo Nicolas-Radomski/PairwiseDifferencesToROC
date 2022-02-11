@@ -20,7 +20,7 @@ library(plyr)
 # transform profiles into a matrix of pairwise differences
 
 ## set working directory for Linux and Mac
-setwd("/home/IZSNT/n.radomski/Documents/RstudioWorkingDirectory/ROC2OutbreakPrediction-20220118")
+setwd("/home/IZSNT/n.radomski/Documents/RstudioWorkingDirectory/PairwiseDifferencesToROC-20220118")
 
 ## read dataframe of profiles (i.e. Profiles.csv)
 ## S stands for sample (i.e. rows): n = 12
