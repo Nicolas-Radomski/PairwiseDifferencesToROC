@@ -1,58 +1,59 @@
 # Usage
 The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) aim at deriving profiles of microbial mutations (e.g. cg/wgMLST, genes, SNPs, InDels, kmers) (Profiles.csv) into a matrix (PairwiseMatrix.csv) and a dataframe (PairwiseDataframe.csv) of pairwise differences with the objective to perform:
 - a Receiver Operating Characteristic (ROC) analysis (ROC.pdf and MetricsROC.txt) assessing the threshold of pairwise differences (Thresholds.csv) presenting the best combination of sensitivity and specificity (ThresholdBest.csv) to distinguish between samples related (i.e. positive controls PC in Types.csv) and unrelated (i.e. negative controls NC in Types.csv) to a studied outbreak
-- predictions of samples based on the best ROC threshold (i.e. tested samples TS in Types.csv) with regard their involment in the investigated outbreak (Predictions.csv).
+- proportions of pairwise differences (between tested and positive samples, i.e. tested samples TS in Types.csv) lower or higher than the best ROC threshold (i.e. Proportions.csv).
 # Input
 ## Profiles of microbial mutations (i.e. Profiles.csv)
 - S stands for sample
 - L stands for locus
 - A stands for allele
+- 0 stands dor missing data
 ```
-sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
-    S1 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
-    S2 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A87 A54 A47
-    S3 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A86 A54 A47
-    S4 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A87 A54 A47
-    S5 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A98 A54 A47
-    S6 A10 A15 A10 A12 A30 A10 A24 A10  A12  A55 A66  A5 A98 A54 A47
-    S7 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-    S8 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-    S9 A41 A15 A41 A12 A30 A41 A24 A41  A12  A55 A66  A8 A97 A54 A47
-   S10 A50 A22 A50 A22 A55 A51 A27 A50  A27  A66 A66  A8 A97 A54 A47
-   S11 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
-   S12 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
-   S13 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A87 A54 A47
-   S14 A41 A15 A41 A12 A30 A41 A24 A41  A12  A55 A66  A8 A97 A54 A47
-   S15 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
-   S16 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
-   S17 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A87 A54 A47
-   S18 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-   S19 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-   S20 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
+sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15 L16 L17 L18  L19 L20
+    S1 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47   0 G63 G76 G100 G32
+    S2 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47 G23   0 G76 G100 G32
+    S3 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G86 G54 G47 G23 G63   0 G100 G32
+    S4 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47 G23 G63 G76    0 G32
+    S5 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G98 G54 G47 G23 G63 G76 G100   0
+    S6 G10 G15 G10 G12 G30 G10 G24 G10  G12  G55 G66  G5 G98 G54 G47 G23 G63 G76 G100 G32
+    S7 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+    S8 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+    S9 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+   S10 G50 G22 G50 G22 G55 G51 G27 G50  G27  G66 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+   S11 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10 G23 G63 G76 G100 G32
+   S12 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1 G23 G63 G76 G100 G32
+   S13 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47 G23 G63 G76 G100 G32
+   S14 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+   S15 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47 G23 G63 G76 G100 G32
+   S16 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10 G23 G63 G76 G100 G32
+   S17 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47 G23 G63 G76 G100 G32
+   S18 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+   S19 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+   S20 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1 G23 G63 G76 G100 G32
 ```
 ## Positive (PC) and negative (NC) controls of the outbreak, as well as tested samples (TS) (i.e. Types.csv)
 ```
-	Sample	Type
-	S1	PC
-	S2	PC
-	S3	PC
-	S4	PC
-	S5	PC
-	S6	PC
-	S7	PC
-	S8	NC
-	S9	NC
-	S10	NC
-	S11	NC
-	S12	NC
-	S13	TS
-	S14	TS
-	S15	TS
-	S16	TS
-	S17	TS
-	S18	TS
-	S19	TS
-	S20	TS
+Sample	Type
+    S1    PC
+    S2    PC
+    S3    PC
+    S4    PC
+    S5    PC
+    S6    PC
+    S7    PC
+    S8    NC
+    S9    NC
+   S10    NC
+   S11    NC
+   S12    NC
+   S13    TS
+   S14    TS
+   S15    TS
+   S16    TS
+   S17    TS
+   S18    TS
+   S19    TS
+   S20    TS
 ```
 
 # Output
@@ -82,63 +83,70 @@ S20 13 14 13 14 14 13 13 13 13  13   4   0  14  13  13   4  14  13  13   0
 ```
 ## Dataframe of pairwise differences of microbial mutations (i.e. PairwiseDataframe.csv)
 ```
-FirstSample SecondSample Differences FirstFlag SecondFlag    Status
-         S1           S1           0        PC         PC   related
-         S2           S1           2        PC         PC   related
-         S3           S1           1        PC         PC   related
-         S4           S1           5        PC         PC   related
-         S5           S1           5        PC         PC   related
-         S6           S1           5        PC         PC   related
-         S7           S1          11        PC         PC   related
-         S8           S1          11        NC         PC unrelated
-         S9           S1           6        NC         PC unrelated
-        S10           S1          12        NC         PC unrelated
-        S11           S1          12        NC         PC unrelated
-        S12           S1          13        NC         PC unrelated
+FirstSample SecondSample Differences FirstType SecondType    Status
+         S1           S2           2        PC         PC   related
+         S1           S3           1        PC         PC   related
+         S1           S4           5        PC         PC   related
+         S1           S5           5        PC         PC   related
+         S1           S6           5        PC         PC   related
+         S1           S7          11        PC         PC   related
+         S1           S8          11        PC         NC unrelated
+         S1           S9           6        PC         NC unrelated
+         S1          S10          12        PC         NC unrelated
+         S1          S11          12        PC         NC unrelated
+         S1          S12          13        PC         NC unrelated
+         S1          S13           2        PC         TS      test
+         S1          S14           6        PC         TS      test
+         S1          S15           0        PC         TS      test
+         S1          S16          12        PC         TS      test
+         S1          S17           5        PC         TS      test
+         S1          S18          11        PC         TS      test
+         S1          S19          11        PC         TS      test
+         S1          S20          13        PC         TS      test
 ...
 ```
 ## ROC analysis and related metrics (i.e. ROC.pdf and MetricsROC.txt)
 ```
-Working directory path: /home/IZSNT/n.radomski/Downloads/PairwiseDifferencesToROC-main 
+Working directory path: /home/IZSNT/n.radomski/Documents/RstudioWorkingDirectory/PairwiseDifferencesToROC-20220217 
 First argument: Profiles.csv 
 Second argument: Types.csv 
-Area under the curve: 85.34%
-Variance: 11.34
+Area under the curve: 83.13%
+Variance: 28.63 
 ```
 ## Sentitivity and specificity of thresholds (i.e. Thresholds.csv)
 ```
-threshold sensitivity specificity
-     -Inf   100.00000     0.00000
-      0.5    97.14286    14.28571
-      1.5    97.14286    26.53061
-      3.5    97.14286    30.61224
-      5.5    97.14286    46.93878
-      7.0    85.71429    67.34694
-      8.5    80.00000    71.42857
-      9.5    80.00000    75.51020
-     10.5    74.28571    75.51020
-     11.5    68.57143    83.67347
-     12.5    34.28571   100.00000
-     13.5    11.42857   100.00000
-      Inf     0.00000   100.00000
+Threshold Sensitivity Specificity
+      Inf   100.00000     0.00000
+     13.5   100.00000    11.42857
+     12.5   100.00000    34.28571
+     11.5    80.95238    68.57143
+     10.5    71.42857    74.28571
+      9.5    71.42857    80.00000
+      8.5    66.66667    80.00000
+      7.0    61.90476    85.71429
+      5.5    38.09524    97.14286
+      3.5    19.04762    97.14286
+      1.5    14.28571    97.14286
+      0.5     0.00000    97.14286
+     -Inf     0.00000   100.00000
 ```
 ## Sentitivity and specificity of the best threshold (i.e. ThresholdBest.csv)
 ```
-threshold sensitivity specificity
-      9.5          80     75.5102
+Threshold Sensitivity Specificity
+      9.5    71.42857          80
 ```
 
-## Prediction about the tested samples (i.e. Predictions.csv)
+## Proportions of pairwise differences (between tested and positive samples) lower or higher than the threshold (i.e. Proportions.csv)
 ```
-TestedSample LowerThreshold HigherThreshold ProportionLower ProportionHigher            Prediction
-         S13              6               1            85.7             14.3   potentially related
-         S14              5               2            71.4             28.6 potentially unrelated
-         S15              6               1            85.7             14.3   potentially related
-         S16              0               7             0.0            100.0    probably unrelated
-         S17              6               1            85.7             14.3   potentially related
-         S18              1               6            14.3             85.7 potentially unrelated
-         S19              1               6            14.3             85.7 potentially unrelated
-         S20              0               7             0.0            100.0    probably unrelated
+TestedSample LowerThreshold HigherThreshold ProportionLower ProportionHigher
+         S13              5               1            83.3             16.7
+         S14              4               2            66.7             33.3
+         S15              5               1            83.3             16.7
+         S16              0               6             0.0            100.0
+         S17              5               1            83.3             16.7
+         S18              1               5            16.7             83.3
+         S19              1               5            16.7             83.3
+         S20              0               5             0.0            100.0
 ```
 
 # Install R and Rstudio
@@ -188,7 +196,7 @@ install.packages(missing_packages$Package)
 ## Install dependencies from the R console
 The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) were prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
 ```
-install.packages("ape")
+install.packages("benchmarkme")
 install.packages("data.table")
 install.packages("spaa")
 install.packages("pROC")

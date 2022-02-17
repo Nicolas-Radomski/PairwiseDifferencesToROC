@@ -4,14 +4,18 @@
 
 ## clean environment
 rm(list=ls())
+# reset graph devices
+graphics.off()
 
 ## install regular packages
+install.packages("benchmarkme")
 install.packages("data.table")
 install.packages("spaa")
 install.packages("pROC")
 install.packages("plyr")
 
 ## call library
+library(benchmarkme)
 library(data.table)
 library(spaa)
 library(pROC)
@@ -20,78 +24,113 @@ library(plyr)
 # transform profiles into a matrix of pairwise differences
 
 ## set working directory for Linux and Mac
-setwd("/home/IZSNT/n.radomski/Documents/RstudioWorkingDirectory/PairwiseDifferencesToROC-20220118")
+setwd("/home/IZSNT/n.radomski/Documents/RstudioWorkingDirectory/PairwiseDifferencesToROC-20220217")
 
-## read dataframe of profiles (i.e. Profiles.csv)
+# prepare profiles
 ## S stands for sample (i.e. rows): n = 12
-## L stands for locus (i.e. columns): n = 15
-## A stands for allele (i.e. data): n= 180
-dfp = read.table("Profiles.csv", dec = ".", header=TRUE, sep = ",", quote = "")
-
+## L stands for locus (i.e. columns): n = 20
+## G stands for genotype (i.e. data): n= 240
+## 0 stands dor missing data
+## read dataframe of profiles (i.e. Profiles.csv) with missing data (encoded 0)
+dfpm <- read.table("Profiles.csv", dec = ".", header=TRUE, sep = ",", quote = "")
 ## make sure that each variable of the dataframe is a character
-dfp = data.frame(lapply(dfp, as.character))
-
+dfpm <- data.frame(lapply(dfpm, as.character))
 ## check nature of variables (must be character for each variable)
-str(dfp)
-
-## check dimension (i.e. [1] 20 16)
-dim(dfp)
-
-## check 20 first lines
-head(dfp, 20)
-comment <- scan(what="character")
-   sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
-1      S1 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
-2      S2 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A87 A54 A47
-3      S3 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A86 A54 A47
-4      S4 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A87 A54 A47
-5      S5 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A98 A54 A47
-6      S6 A10 A15 A10 A12 A30 A10 A24 A10  A12  A55 A66  A5 A98 A54 A47
-7      S7 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-8      S8 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-9      S9 A41 A15 A41 A12 A30 A41 A24 A41  A12  A55 A66  A8 A97 A54 A47
-10    S10 A50 A22 A50 A22 A55 A51 A27 A50  A27  A66 A66  A8 A97 A54 A47
-11    S11 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
-12    S12 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
-13    S13 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A2 A87 A54 A47
-14    S14 A41 A15 A41 A12 A30 A41 A24 A41  A12  A55 A66  A8 A97 A54 A47
-15    S15 A20 A15 A55 A12 A30 A11 A24 A66  A12  A55 A66  A5 A86 A54 A47
-16    S16 A10 A54 A15 A41 A65 A88 A75 A89 A420 A998 A66  A5 A86 A11 A10
-17    S17 A20 A31 A55 A30 A30 A11 A55 A66  A55  A55 A66  A5 A87 A54 A47
-18    S18 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-19    S19 A41 A22 A41 A22 A22 A41 A27 A41  A27  A27 A66  A9 A86 A54 A47
-20    S20 A10 A54 A98 A41 A65 A88 A75 A89 A420 A998 A66  A8 A86 A14  A1
+str(dfpm)
+## check dimension (i.e. [1] 20 21)
+dim(dfpm)
+## check dataframe
+dfpm
+comment <- scan(what="character", quiet = TRUE)
+   sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15 L16 L17 L18  L19 L20
+1      S1 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47   0 G63 G76 G100 G32
+2      S2 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47 G23   0 G76 G100 G32
+3      S3 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G86 G54 G47 G23 G63   0 G100 G32
+4      S4 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47 G23 G63 G76    0 G32
+5      S5 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G98 G54 G47 G23 G63 G76 G100   0
+6      S6 G10 G15 G10 G12 G30 G10 G24 G10  G12  G55 G66  G5 G98 G54 G47 G23 G63 G76 G100 G32
+7      S7 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+8      S8 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+9      S9 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+10    S10 G50 G22 G50 G22 G55 G51 G27 G50  G27  G66 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+11    S11 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10 G23 G63 G76 G100 G32
+12    S12 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1 G23 G63 G76 G100 G32
+13    S13 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47 G23 G63 G76 G100 G32
+14    S14 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47 G23 G63 G76 G100 G32
+15    S15 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47 G23 G63 G76 G100 G32
+16    S16 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10 G23 G63 G76 G100 G32
+17    S17 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47 G23 G63 G76 G100 G32
+18    S18 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+19    S19 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47 G23 G63 G76 G100 G32
+20    S20 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1 G23 G63 G76 G100 G32
 
 rm(comment)
 
+## replace missing data encoded 0 with NA
+dfpm[ dfpm == "0" ] <- NA
+## remove columns harboring NAs (i.e. locus with missing data)
+dfp <- dfpm[ , colSums(is.na(dfpm)) == 0]
+## check dimension (i.e. [1] 20 16)
+dim(dfp)
+## check dataframe
+dfp
+comment <- scan(what="character", quiet = TRUE)
+   sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15
+1      S1 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47
+2      S2 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47
+3      S3 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G86 G54 G47
+4      S4 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47
+5      S5 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G98 G54 G47
+6      S6 G10 G15 G10 G12 G30 G10 G24 G10  G12  G55 G66  G5 G98 G54 G47
+7      S7 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47
+8      S8 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47
+9      S9 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47
+10    S10 G50 G22 G50 G22 G55 G51 G27 G50  G27  G66 G66  G8 G97 G54 G47
+11    S11 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10
+12    S12 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1
+13    S13 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G2 G87 G54 G47
+14    S14 G41 G15 G41 G12 G30 G41 G24 G41  G12  G55 G66  G8 G97 G54 G47
+15    S15 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47
+16    S16 G10 G54 G15 G41 G65 G88 G75 G89 G420 G998 G66  G5 G86 G11 G10
+17    S17 G20 G31 G55 G30 G30 G11 G55 G66  G55  G55 G66  G5 G87 G54 G47
+18    S18 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47
+19    S19 G41 G22 G41 G22 G22 G41 G27 G41  G27  G27 G66  G9 G86 G54 G47
+20    S20 G10 G54 G98 G41 G65 G88 G75 G89 G420 G998 G66  G8 G86 G14  G1
+
+rm(comment)
+
+# transform profiles into matrix of pairwise differences
+## identify logical CPUs available of your machine
+CPU <- get_cpu()$no_of_cores
+## check threads used by the function data.table
+getDTthreads(verbose=TRUE)
+## set to use logical CPUs available minus 2 CPU for OS
+setDTthreads(threads = CPU-2, restore_after_fork = TRUE, throttle = 1024)
+## check threads used by the function data.table
+getDTthreads(verbose=TRUE)
 ## transpose dataframe
 tdfp <- transpose(dfp, keep.names = "locus", make.names = "sample")
-
-## check nature of variables (must be character for each variable)
-str(tdfp)
-
-## check dimension (i.e. [1] 15 21)
+## check dimension (i.e. [1] 26 21)
 dim(tdfp)
-
-## check 20 first lines
-head(tdfp, 20)
-comment <- scan(what="character")
+## check transposed dataframe
+tdfp
+comment <- scan(what="character", quiet = TRUE)
    locus  S1  S2  S3  S4  S5  S6  S7  S8  S9 S10  S11  S12 S13 S14 S15  S16 S17 S18 S19  S20
-1     L1 A20 A20 A20 A20 A20 A10 A41 A41 A41 A50  A10  A10 A20 A41 A20  A10 A20 A41 A41  A10
-2     L2 A15 A15 A15 A31 A31 A15 A22 A22 A15 A22  A54  A54 A15 A15 A15  A54 A31 A22 A22  A54
-3     L3 A55 A55 A55 A55 A55 A10 A41 A41 A41 A50  A15  A98 A55 A41 A55  A15 A55 A41 A41  A98
-4     L4 A12 A12 A12 A30 A30 A12 A22 A22 A12 A22  A41  A41 A12 A12 A12  A41 A30 A22 A22  A41
-5     L5 A30 A30 A30 A30 A30 A30 A22 A22 A30 A55  A65  A65 A30 A30 A30  A65 A30 A22 A22  A65
-6     L6 A11 A11 A11 A11 A11 A10 A41 A41 A41 A51  A88  A88 A11 A41 A11  A88 A11 A41 A41  A88
-7     L7 A24 A24 A24 A55 A55 A24 A27 A27 A24 A27  A75  A75 A24 A24 A24  A75 A55 A27 A27  A75
-8     L8 A66 A66 A66 A66 A66 A10 A41 A41 A41 A50  A89  A89 A66 A41 A66  A89 A66 A41 A41  A89
-9     L9 A12 A12 A12 A55 A55 A12 A27 A27 A12 A27 A420 A420 A12 A12 A12 A420 A55 A27 A27 A420
-10   L10 A55 A55 A55 A55 A55 A55 A27 A27 A55 A66 A998 A998 A55 A55 A55 A998 A55 A27 A27 A998
-11   L11 A66 A66 A66 A66 A66 A66 A66 A66 A66 A66  A66  A66 A66 A66 A66  A66 A66 A66 A66  A66
-12   L12  A5  A2  A2  A5  A5  A5  A9  A9  A8  A8   A5   A8  A2  A8  A5   A5  A5  A9  A9   A8
-13   L13 A86 A87 A86 A87 A98 A98 A86 A86 A97 A97  A86  A86 A87 A97 A86  A86 A87 A86 A86  A86
-14   L14 A54 A54 A54 A54 A54 A54 A54 A54 A54 A54  A11  A14 A54 A54 A54  A11 A54 A54 A54  A14
-15   L15 A47 A47 A47 A47 A47 A47 A47 A47 A47 A47  A10   A1 A47 A47 A47  A10 A47 A47 A47   A1
+1     L1 G20 G20 G20 G20 G20 G10 G41 G41 G41 G50  G10  G10 G20 G41 G20  G10 G20 G41 G41  G10
+2     L2 G15 G15 G15 G31 G31 G15 G22 G22 G15 G22  G54  G54 G15 G15 G15  G54 G31 G22 G22  G54
+3     L3 G55 G55 G55 G55 G55 G10 G41 G41 G41 G50  G15  G98 G55 G41 G55  G15 G55 G41 G41  G98
+4     L4 G12 G12 G12 G30 G30 G12 G22 G22 G12 G22  G41  G41 G12 G12 G12  G41 G30 G22 G22  G41
+5     L5 G30 G30 G30 G30 G30 G30 G22 G22 G30 G55  G65  G65 G30 G30 G30  G65 G30 G22 G22  G65
+6     L6 G11 G11 G11 G11 G11 G10 G41 G41 G41 G51  G88  G88 G11 G41 G11  G88 G11 G41 G41  G88
+7     L7 G24 G24 G24 G55 G55 G24 G27 G27 G24 G27  G75  G75 G24 G24 G24  G75 G55 G27 G27  G75
+8     L8 G66 G66 G66 G66 G66 G10 G41 G41 G41 G50  G89  G89 G66 G41 G66  G89 G66 G41 G41  G89
+9     L9 G12 G12 G12 G55 G55 G12 G27 G27 G12 G27 G420 G420 G12 G12 G12 G420 G55 G27 G27 G420
+10   L10 G55 G55 G55 G55 G55 G55 G27 G27 G55 G66 G998 G998 G55 G55 G55 G998 G55 G27 G27 G998
+11   L11 G66 G66 G66 G66 G66 G66 G66 G66 G66 G66  G66  G66 G66 G66 G66  G66 G66 G66 G66  G66
+12   L12  G5  G2  G2  G5  G5  G5  G9  G9  G8  G8   G5   G8  G2  G8  G5   G5  G5  G9  G9   G8
+13   L13 G86 G87 G86 G87 G98 G98 G86 G86 G97 G97  G86  G86 G87 G97 G86  G86 G87 G86 G86  G86
+14   L14 G54 G54 G54 G54 G54 G54 G54 G54 G54 G54  G11  G14 G54 G54 G54  G11 G54 G54 G54  G14
+15   L15 G47 G47 G47 G47 G47 G47 G47 G47 G47 G47  G10   G1 G47 G47 G47  G10 G47 G47 G47   G1
 
 rm(comment)
 
@@ -266,7 +305,7 @@ sample <- dfp$sample
 pwd <- data.frame(sample, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20)
 #### check pairwise differences
 pwd
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
    sample S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 S11 S12 S13 S14 S15 S16 S17 S18 S19 S20
 1      S1  0  2  1  5  5  5 11 11  6  12  12  13   2   6   0  12   5  11  11  13
 2      S2  2  0  1  5  6  6 12 12  6  12  14  14   0   6   2  14   5  12  12  14
@@ -298,7 +337,7 @@ pwddata <- c(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13, S14, S15, S
 pwdmat <- matrix(pwddata,nrow=20,ncol=20,byrow=TRUE)
 #### check pairwise differences
 pwdmat
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14] [,15] [,16] [,17] [,18] [,19] [,20]
 [1,]    0    2    1    5    5    5   11   11    6    12    12    13     2     6     0    12     5    11    11    13
 [2,]    2    0    1    5    6    6   12   12    6    12    14    14     0     6     2    14     5    12    12    14
@@ -336,7 +375,7 @@ for (i in tdfp[, 2:ncol(tdfp)]) { # first for loop from the column 2 of the data
 }
 ### check the output vector v
 print(v)
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
   [1]  0  2  1  5  5  5 11 11  6 12 12 13  2  6  0 12  5 11 11 13
  [21]  2  0  1  5  6  6 12 12  6 12 14 14  0  6  2 14  5 12 12 14
  [41]  1  1  0  6  6  6 11 11  6 12 13 13  1  6  1 13  6 11 11 13
@@ -375,7 +414,7 @@ colnames(mat) <- sample
 class(mat)
 ### check pairwise differences
 mat
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
     S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 S11 S12 S13 S14 S15 S16 S17 S18 S19 S20
 S1   0  2  1  5  5  5 11 11  6  12  12  13   2   6   0  12   5  11  11  13
 S2   2  0  1  5  6  6 12 12  6  12  14  14   0   6   2  14   5  12  12  14
@@ -401,7 +440,7 @@ S20 13 14 13 14 14 13 13 13 13  13   4   0  14  13  13   4  14  13  13   0
 rm(comment)
 
 ### export the matrix into a csv file
-write.csv(mat,file="PairwiseMatrix.csv")
+write.csv(mat,file="PairwiseMatrix.csv", row.names=TRUE, quote=FALSE)
 
 # transform the matrix of pairwise differences into a dataframe
 
@@ -413,7 +452,7 @@ class(distobj)
 
 ## check the dist object
 distobj
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
     S1 S2 S3 S4 S5 S6 S7 S8 S9 S10 S11 S12 S13 S14 S15 S16 S17 S18 S19
 S2   2                                                                
 S3   1  1                                                             
@@ -456,7 +495,7 @@ names(dfl)[names(dfl) == "value"] <- "Differences"
 
 ## check the long dataframe
 dfl
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
     FirstSample SecondSample Differences
 1            S1           S1           0
 2            S2           S1           2
@@ -795,12 +834,23 @@ comment <- scan(what="character")
 
 rm(comment)
 
+# remove pairwise differences from identical samples (i.e. matrix diagonal = 0)
+dfl$Diagonal <- ifelse((dfl$FirstSample == dfl$SecondSample), "YES", "NO")
+dfl <- subset(dfl,dfl$Diagonal %in% c("NO"))
+dfl$Diagonal <- NULL
+dim(dfl) # [1] 380   3
+
+# remove duplicates of pairwise differences
+dfl[1:2] <- t( apply(dfl[1:2], 1, sort) )
+dfl <- dfl[!duplicated(dfl[1:2]),]
+dim(dfl) # [1] 190   3
+
 # perform a Receiver Operating Characteristic (ROC) analysis from the dataframe of pairwise differences
 ## suppose that the samples S1, S2, S3, S4, S5, S6 and S7 are positive controls (PC) of an outbreak
 ## suppose that the samples S8, S9, S10, S11 and S12 are negative controls (NC) of an outbreak
 ## suppose that the samples S13, S14, S15, S16, S17, S18, S19 and S20 are tested samples (TS)
 ## complete the file Types.csv as below
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
 Sample	Type
 S1	PC
 S2	PC
@@ -865,41 +915,38 @@ dfl$Status <-
                                                                  "error")))))))))
 
 ## subset the related and unrelated pairs
-### check dimension (i.e. [1] 400   6)
+### check dimension (i.e. [1] 190   6)
 dim(dfl)
 ### check dataframe
 dfl
-comment <- scan(what="character")
-FirstSample SecondSample Differences FirstType SecondType    Status
-1            S1           S1           0        PC         PC   related
-2            S2           S1           2        PC         PC   related
-3            S3           S1           1        PC         PC   related
-4            S4           S1           5        PC         PC   related
-5            S5           S1           5        PC         PC   related
-6            S6           S1           5        PC         PC   related
-7            S7           S1          11        PC         PC   related
-8            S8           S1          11        NC         PC unrelated
-9            S9           S1           6        NC         PC unrelated
-10          S10           S1          12        NC         PC unrelated
-11          S11           S1          12        NC         PC unrelated
-12          S12           S1          13        NC         PC unrelated
-13          S13           S1           2        TS         PC      test
-14          S14           S1           6        TS         PC      test
-15          S15           S1           0        TS         PC      test
-16          S16           S1          12        TS         PC      test
-17          S17           S1           5        TS         PC      test
-18          S18           S1          11        TS         PC      test
-19          S19           S1          11        TS         PC      test
-20          S20           S1          13        TS         PC      test
-21           S1           S2           2        PC         PC   related
-22           S2           S2           0        PC         PC   related
-23           S3           S2           1        PC         PC   related
-24           S4           S2           5        PC         PC   related
-25           S5           S2           6        PC         PC   related
-26           S6           S2           6        PC         PC   related
-27           S7           S2          12        PC         PC   related
-28           S8           S2          12        NC         PC unrelated
-29           S9           S2           6        NC         PC unrelated
+comment <- scan(what="character", quiet = TRUE)
+    FirstSample SecondSample Differences FirstType SecondType    Status
+2            S1           S2           2        PC         PC   related
+3            S1           S3           1        PC         PC   related
+4            S1           S4           5        PC         PC   related
+5            S1           S5           5        PC         PC   related
+6            S1           S6           5        PC         PC   related
+7            S1           S7          11        PC         PC   related
+8            S1           S8          11        PC         NC unrelated
+9            S1           S9           6        PC         NC unrelated
+10           S1          S10          12        PC         NC unrelated
+11           S1          S11          12        PC         NC unrelated
+12           S1          S12          13        PC         NC unrelated
+13           S1          S13           2        PC         TS      test
+14           S1          S14           6        PC         TS      test
+15           S1          S15           0        PC         TS      test
+16           S1          S16          12        PC         TS      test
+17           S1          S17           5        PC         TS      test
+18           S1          S18          11        PC         TS      test
+19           S1          S19          11        PC         TS      test
+20           S1          S20          13        PC         TS      test
+23           S2           S3           1        PC         PC   related
+24           S2           S4           5        PC         PC   related
+25           S2           S5           6        PC         PC   related
+26           S2           S6           6        PC         PC   related
+27           S2           S7          12        PC         PC   related
+28           S2           S8          12        PC         NC unrelated
+29           S2           S9           6        PC         NC unrelated
 30          S10           S2          12        NC         PC unrelated
 31          S11           S2          14        NC         PC unrelated
 32          S12           S2          14        NC         PC unrelated
@@ -910,16 +957,13 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 37          S17           S2           5        TS         PC      test
 38          S18           S2          12        TS         PC      test
 39          S19           S2          12        TS         PC      test
-40          S20           S2          14        TS         PC      test
-41           S1           S3           1        PC         PC   related
-42           S2           S3           1        PC         PC   related
-43           S3           S3           0        PC         PC   related
-44           S4           S3           6        PC         PC   related
-45           S5           S3           6        PC         PC   related
-46           S6           S3           6        PC         PC   related
-47           S7           S3          11        PC         PC   related
-48           S8           S3          11        NC         PC unrelated
-49           S9           S3           6        NC         PC unrelated
+40           S2          S20          14        PC         TS      test
+44           S3           S4           6        PC         PC   related
+45           S3           S5           6        PC         PC   related
+46           S3           S6           6        PC         PC   related
+47           S3           S7          11        PC         PC   related
+48           S3           S8          11        PC         NC unrelated
+49           S3           S9           6        PC         NC unrelated
 50          S10           S3          12        NC         PC unrelated
 51          S11           S3          13        NC         PC unrelated
 52          S12           S3          13        NC         PC unrelated
@@ -931,15 +975,11 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 58          S18           S3          11        TS         PC      test
 59          S19           S3          11        TS         PC      test
 60          S20           S3          13        TS         PC      test
-61           S1           S4           5        PC         PC   related
-62           S2           S4           5        PC         PC   related
-63           S3           S4           6        PC         PC   related
-64           S4           S4           0        PC         PC   related
-65           S5           S4           1        PC         PC   related
-66           S6           S4           9        PC         PC   related
-67           S7           S4          12        PC         PC   related
-68           S8           S4          12        NC         PC unrelated
-69           S9           S4          10        NC         PC unrelated
+65           S4           S5           1        PC         PC   related
+66           S4           S6           9        PC         PC   related
+67           S4           S7          12        PC         PC   related
+68           S4           S8          12        PC         NC unrelated
+69           S4           S9          10        PC         NC unrelated
 70          S10           S4          12        NC         PC unrelated
 71          S11           S4          13        NC         PC unrelated
 72          S12           S4          14        NC         PC unrelated
@@ -951,15 +991,10 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 78          S18           S4          12        TS         PC      test
 79          S19           S4          12        TS         PC      test
 80          S20           S4          14        TS         PC      test
-81           S1           S5           5        PC         PC   related
-82           S2           S5           6        PC         PC   related
-83           S3           S5           6        PC         PC   related
-84           S4           S5           1        PC         PC   related
-85           S5           S5           0        PC         PC   related
-86           S6           S5           8        PC         PC   related
-87           S7           S5          12        PC         PC   related
-88           S8           S5          12        NC         PC unrelated
-89           S9           S5          10        NC         PC unrelated
+86           S5           S6           8        PC         PC   related
+87           S5           S7          12        PC         PC   related
+88           S5           S8          12        PC         NC unrelated
+89           S5           S9          10        PC         NC unrelated
 90          S10           S5          12        NC         PC unrelated
 91          S11           S5          13        NC         PC unrelated
 92          S12           S5          14        NC         PC unrelated
@@ -971,15 +1006,9 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 98          S18           S5          12        TS         PC      test
 99          S19           S5          12        TS         PC      test
 100         S20           S5          14        TS         PC      test
-101          S1           S6           5        PC         PC   related
-102          S2           S6           6        PC         PC   related
-103          S3           S6           6        PC         PC   related
-104          S4           S6           9        PC         PC   related
-105          S5           S6           8        PC         PC   related
-106          S6           S6           0        PC         PC   related
-107          S7           S6          12        PC         PC   related
-108          S8           S6          12        NC         PC unrelated
-109          S9           S6           6        NC         PC unrelated
+107          S6           S7          12        PC         PC   related
+108          S6           S8          12        PC         NC unrelated
+109          S6           S9           6        PC         NC unrelated
 110         S10           S6          12        NC         PC unrelated
 111         S11           S6          12        NC         PC unrelated
 112         S12           S6          13        NC         PC unrelated
@@ -991,15 +1020,8 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 118         S18           S6          12        TS         PC      test
 119         S19           S6          12        TS         PC      test
 120         S20           S6          13        TS         PC      test
-121          S1           S7          11        PC         PC   related
-122          S2           S7          12        PC         PC   related
-123          S3           S7          11        PC         PC   related
-124          S4           S7          12        PC         PC   related
-125          S5           S7          12        PC         PC   related
-126          S6           S7          12        PC         PC   related
-127          S7           S7           0        PC         PC   related
-128          S8           S7           0        NC         PC unrelated
-129          S9           S7           8        NC         PC unrelated
+128          S7           S8           0        PC         NC unrelated
+129          S7           S9           8        PC         NC unrelated
 130         S10           S7           8        NC         PC unrelated
 131         S11           S7          13        NC         PC unrelated
 132         S12           S7          13        NC         PC unrelated
@@ -1011,15 +1033,7 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 138         S18           S7           0        TS         PC      test
 139         S19           S7           0        TS         PC      test
 140         S20           S7          13        TS         PC      test
-141          S1           S8          11        PC         NC unrelated
-142          S2           S8          12        PC         NC unrelated
-143          S3           S8          11        PC         NC unrelated
-144          S4           S8          12        PC         NC unrelated
-145          S5           S8          12        PC         NC unrelated
-146          S6           S8          12        PC         NC unrelated
-147          S7           S8           0        PC         NC unrelated
-148          S8           S8           0        NC         NC     extra
-149          S9           S8           8        NC         NC     extra
+149          S8           S9           8        NC         NC     extra
 150         S10           S8           8        NC         NC     extra
 151         S11           S8          13        NC         NC     extra
 152         S12           S8          13        NC         NC     extra
@@ -1031,32 +1045,66 @@ FirstSample SecondSample Differences FirstType SecondType    Status
 158         S18           S8           0        TS         NC      test
 159         S19           S8           0        TS         NC      test
 160         S20           S8          13        TS         NC      test
-161          S1           S9           6        PC         NC unrelated
-162          S2           S9           6        PC         NC unrelated
-163          S3           S9           6        PC         NC unrelated
-164          S4           S9          10        PC         NC unrelated
-165          S5           S9          10        PC         NC unrelated
-166          S6           S9           6        PC         NC unrelated
-[ reached 'max' / getOption("max.print") -- omitted 234 rows ]
+170         S10           S9          10        NC         NC     extra
+171         S11           S9          14        NC         NC     extra
+172         S12           S9          13        NC         NC     extra
+173         S13           S9           6        TS         NC      test
+174         S14           S9           0        TS         NC      test
+175         S15           S9           6        TS         NC      test
+176         S16           S9          14        TS         NC      test
+177         S17           S9          10        TS         NC      test
+178         S18           S9           8        TS         NC      test
+179         S19           S9           8        TS         NC      test
+180         S20           S9          13        TS         NC      test
+191         S10          S11          14        NC         NC     extra
+192         S10          S12          13        NC         NC     extra
+193         S10          S13          12        NC         TS      test
+194         S10          S14          10        NC         TS      test
+195         S10          S15          12        NC         TS      test
+196         S10          S16          14        NC         TS      test
+197         S10          S17          12        NC         TS      test
+198         S10          S18           8        NC         TS      test
+199         S10          S19           8        NC         TS      test
+200         S10          S20          13        NC         TS      test
+212         S11          S12           4        NC         NC     extra
+213         S11          S13          14        NC         TS      test
+214         S11          S14          14        NC         TS      test
+215         S11          S15          12        NC         TS      test
+216         S11          S16           0        NC         TS      test
+217         S11          S17          13        NC         TS      test
+218         S11          S18          13        NC         TS      test
+219         S11          S19          13        NC         TS      test
+220         S11          S20           4        NC         TS      test
+233         S12          S13          14        NC         TS      test
+234         S12          S14          13        NC         TS      test
+235         S12          S15          13        NC         TS      test
+236         S12          S16           4        NC         TS      test
+237         S12          S17          14        NC         TS      test
+238         S12          S18          13        NC         TS      test
+239         S12          S19          13        NC         TS      test
+240         S12          S20           0        NC         TS      test
+254         S13          S14           6        TS         TS      test
+255         S13          S15           2        TS         TS      test
+256         S13          S16          14        TS         TS      test
+257         S13          S17           5        TS         TS      test
+[ reached 'max' / getOption("max.print") -- omitted 24 rows ]
 
 rm(comment)
 
 ### export the dataframe into a csv file
-write.csv(dfl,file="PairwiseDataframe.csv")
+write.csv(dfl,file="PairwiseDataframe.csv", row.names=FALSE, quote=FALSE)
 
 ### subset dataframe for ROC analysis (i.e. related and unrelated status)
 dflROC <- subset(dfl,dfl$Status %in% c("related","unrelated"))
-## check dimension (i.e. [1] 119  6)
+## check dimension (i.e. [1] 56  6)
 dim(dflROC)
 
 ## run a ROC analysis and plot
-### reset graph devices
-graphics.off()
 ### open a pdf file
 pdf("ROC.pdf")
 ### run a analysis
 ROC <- roc(dflROC$Status, dflROC$Differences,
-           percent=TRUE,
+           percent=TRUE, quiet = TRUE, levels = c("unrelated", "related"), direction = ">",
            ci=TRUE, boot.n=100, ci.alpha=0.9, stratified=FALSE,
            plot=TRUE, auc.polygon=TRUE, max.auc.polygon=TRUE, grid=TRUE,
            print.auc=TRUE, show.thres=TRUE)
@@ -1066,7 +1114,7 @@ spec.ci <- ci.sp(ROC, sensitivities=seq(0, 100, 5))
 plot(sens.ci, type="shape", col="blue")
 plot(spec.ci, type="shape", col="green")
 ### close the pdf file
-dev.off()
+invisible(dev.off())
 
 ## create MetricsROC.txt where ROC metrics will be saved
 sink("MetricsROC.txt")
@@ -1090,26 +1138,26 @@ names(thresholds)[names(thresholds) == "specificity"] <- "Specificity"
 
 ## check dataframe
 thresholds
-comment <- scan(what="character")
+comment <- scan(what="character", quiet = TRUE)
    Threshold Sensitivity Specificity
-1       -Inf   100.00000     0.00000
-2        0.5    97.14286    14.28571
-3        1.5    97.14286    26.53061
-4        3.5    97.14286    30.61224
-5        5.5    97.14286    46.93878
-6        7.0    85.71429    67.34694
-7        8.5    80.00000    71.42857
-8        9.5    80.00000    75.51020
-9       10.5    74.28571    75.51020
-10      11.5    68.57143    83.67347
-11      12.5    34.28571   100.00000
-12      13.5    11.42857   100.00000
-13       Inf     0.00000   100.00000
+1        Inf   100.00000     0.00000
+2       13.5   100.00000    11.42857
+3       12.5   100.00000    34.28571
+4       11.5    80.95238    68.57143
+5       10.5    71.42857    74.28571
+6        9.5    71.42857    80.00000
+7        8.5    66.66667    80.00000
+8        7.0    61.90476    85.71429
+9        5.5    38.09524    97.14286
+10       3.5    19.04762    97.14286
+11       1.5    14.28571    97.14286
+12       0.5     0.00000    97.14286
+13      -Inf     0.00000   100.00000
 
 rm(comment)
 
 ## export the thresholds into a csv file
-write.csv(thresholds,file="Thresholds.csv")
+write.csv(thresholds,file="Thresholds.csv", row.names=FALSE, quote=FALSE)
 
 ## extract the threshold presenting the best combination of sensitivity and specificity
 best <- coords(ROC, "best", ret=c("threshold", "sensitivity", "specificity"))
@@ -1121,20 +1169,20 @@ names(best)[names(best) == "specificity"] <- "Specificity"
 
 ## check dataframe
 best
-comment <- scan(what="character")
-threshold sensitivity specificity
-1       9.5          80     75.5102
+comment <- scan(what="character", quiet = TRUE)
+Threshold Sensitivity Specificity
+1       9.5    71.42857          80
 
 rm(comment)
 
 ## export the best threshold into a csv file
-write.csv(best,file="ThresholdBest.csv")
+write.csv(best,file="ThresholdBest.csv", row.names=FALSE, quote=FALSE)
 
-# perform prediction on tested samples (TS)
+# calculate proportion of pairwise differences lower and higher that best threshold on tested samples (TS)
 ## extract the best threshold from the ROC analysis
 cutoff  <- best[1,1]
 ## extract pairwise differences of interest of the tested samples (i.e. TS versus PC from the test status)
-### subset dataframe for prediction
+### subset dataframe for proportion
 dfltest <- subset(dfl,dfl$Status %in% c("test"))
 ### retain only forward pairs (i.e. without revers pairs)
 dflTS <- subset(dfltest,dfltest$SecondType %in% c("PC"))
@@ -1155,35 +1203,29 @@ dfhigher <- aggregate(Threshold ~ FirstSample, dflTS, function(x) sum(x == c("hi
 names(dfhigher)[names(dfhigher) == "FirstSample"] <- "TestedSample"
 names(dfhigher)[names(dfhigher) == "Threshold"] <- "HigherThreshold"
 ## joint dataframes
-dfTS <- join(dflower, dfhigher, type = "inner")
+dfTS <- suppressMessages(join(dflower, dfhigher, type = "inner"))
 ## add proportion of lower
 dfTS$ProportionLower <- round(((dfTS$LowerThreshold * 100) / (dfTS$LowerThreshold + dfTS$HigherThreshold)), digits = 1)
 ## add proportion of higher
 dfTS$ProportionHigher <- round(((dfTS$HigherThreshold * 100) / (dfTS$LowerThreshold + dfTS$HigherThreshold)), digits = 1)
-## add messages of prediction with 80%/20% (related/unrelated)
-dfTS$Prediction <- 
-  ifelse((dfTS$ProportionLower == 100) & (dfTS$ProportionHigher == 0), "probably related",
-         ifelse((dfTS$ProportionLower == 0) & (dfTS$ProportionHigher == 100), "probably unrelated",
-                ifelse((dfTS$ProportionLower > 80) & (dfTS$ProportionHigher < 20), "potentially related",
-                       ifelse((dfTS$ProportionLower < 80) & (dfTS$ProportionHigher > 20), "potentially unrelated",
-                              "ambiguous"))))
-### check dataframe
+
+## check dataframe
 dfTS
-comment <- scan(what="character")
-TestedSample LowerThreshold HigherThreshold ProportionLower ProportionHigher            Prediction
-1          S13              6               1            85.7             14.3   potentially related
-2          S14              5               2            71.4             28.6 potentially unrelated
-3          S15              6               1            85.7             14.3   potentially related
-4          S16              0               7             0.0            100.0    probably unrelated
-5          S17              6               1            85.7             14.3   potentially related
-6          S18              1               6            14.3             85.7 potentially unrelated
-7          S19              1               6            14.3             85.7 potentially unrelated
-8          S20              0               7             0.0            100.0    probably unrelated
+comment <- scan(what="character", quiet = TRUE)
+  TestedSample LowerThreshold HigherThreshold ProportionLower ProportionHigher
+1          S13              5               1            83.3             16.7
+2          S14              4               2            66.7             33.3
+3          S15              5               1            83.3             16.7
+4          S16              0               6             0.0            100.0
+5          S17              5               1            83.3             16.7
+6          S18              1               5            16.7             83.3
+7          S19              1               5            16.7             83.3
+8          S20              0               5             0.0            100.0
 
 rm(comment)
 
-## export the predictions into a csv file
-write.csv(dfTS,file="Predictions.csv")
+## export the proportions into a csv file
+write.csv(dfTS,file="Proportions.csv", row.names=FALSE, quote=FALSE)
 
 # add a message
-print("Developped by Nicolas Radomski on January 06 (2022) with the R version 4.1.2 (2021-11-01)")
+cat("Developped by Nicolas Radomski on February 17 (2022) with the R version 4.1.2 (2021-11-01)","\n")
