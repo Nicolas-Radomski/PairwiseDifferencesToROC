@@ -219,7 +219,7 @@ Rscript PairwiseDifferencesToROC.R Profiles.csv Types.csv
 ```
 docker pull nicolasradomski/pairwisedifferencestoroc
 ```
-## 2/ Launch with Docker and different paired-trees
+## 2/ Launch with Docker and input files
 ```
 docker run --name nicolas --rm -v /home/data:/data -v /home/output:/output nicolasradomski/pairwisedifferencestoroc:latest sh -c 'Rscript code/PairwiseDifferencesToROC.R data/Profiles.csv data/Types.csv' > output/std.log 2>&1
 
