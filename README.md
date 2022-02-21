@@ -193,7 +193,7 @@ missing_packages <- as.data.frame(old_packages[!old_packages[, "Package"] %in% n
 install.packages(missing_packages$Package)
 ```
 # Install R dependencies and launch with R
-## Install dependencies from the R console
+## 1/ Install dependencies from the R console
 The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) were prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
 ```
 install.packages("benchmarkme")
@@ -202,13 +202,13 @@ install.packages("spaa")
 install.packages("pROC")
 install.packages("plyr")
 ```
-## Launch each command from Rstudio (i.e. PairwiseDifferences2ROC.R detailed algorithm)
+## 2/ Launch each command from Rstudio (i.e. PairwiseDifferences2ROC.R detailed algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
 rstudio PairwiseDifferences2ROC.R
 ```
-## Launch the whole script from Rscript (i.e. PairwiseDifferencesToROC.R automatic algorithm)
+## 3/ Launch the whole script from Rscript (i.e. PairwiseDifferencesToROC.R automatic algorithm)
 ```
 git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
