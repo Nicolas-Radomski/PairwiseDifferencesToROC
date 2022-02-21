@@ -192,7 +192,7 @@ new_packages <- installed.packages()
 missing_packages <- as.data.frame(old_packages[!old_packages[, "Package"] %in% new_packages[, "Package"],])
 install.packages(missing_packages$Package)
 ```
-# Start
+# Install R dependencies and launch with R
 ## Install dependencies from the R console
 The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and PairwiseDifferencesToROC.R (automatic algorithm with Rscript) were prepared and tested with R version 4.1.2 and RStudio 2021.09.1.
 ```
@@ -214,12 +214,23 @@ git clone https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC.git
 cd PairwiseDifferencesToROC
 Rscript PairwiseDifferencesToROC.R Profiles.csv Types.csv
 ```
+# Install Docker image and launch with Docker
+## 1/ Pull Docker image from Docker Hub
+```
+docker pull nicolasradomski/pairwisedifferencestoroc
+```
+## 2/ Launch with Docker and different paired-trees
+```
+docker run --name nicolas --rm -v /home/data:/data -v /home/output:/output nicolasradomski/pairwisedifferencestoroc:latest sh -c 'Rscript code/PairwiseDifferencesToROC.R data/Profiles.csv data/Types.csv' > output/std.log 2>&1
+
+```
 # Illustration
 ![ROC figure](https://github.com/Nicolas-Radomski/PairwiseDifferencesToROC/blob/main/illustration.png)
 # References
 - Jinlong Zhang J. Package 'spaa' - The Comprehensive R Archive Network. 2016, cran.r-project.org, Version 0.2.2
 - Robin X., Turck N., Hainard A., Tiberti N., Lisacek F., Sanchez J.C., Müller M., Siegert S., Doering M. and Billings Z. pROC: Display and Analyze ROC Curves. 2021, cran.r-project.org, Version 1.18.0
 - Robin, X., Turck, N., Hainard, A. et al. pROC: an open-source package for R and S+ to analyze and compare ROC curves. 2011, BMC Bioinformatics, 12(77): 1-8
+- Docker Hub: https://hub.docker.com/r/nicolasradomski/pairwisedifferencestoroc
 # Acknowledgment
 Adriano Di Pasquale for our discussions about algorithmic approaches
 # Author
