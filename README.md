@@ -6,8 +6,8 @@ The R scripts PairwiseDifferences2ROC.R (detailed algorithm with Rstudio) and Pa
 ## Profiles of microbial mutations (i.e. Profiles.csv)
 - S stands for sample
 - L stands for locus
-- A stands for allele
-- 0 stands dor missing data
+- G stands for genotype
+- 0 stands for missing data
 ```
 sample  L1  L2  L3  L4  L5  L6  L7  L8   L9  L10 L11 L12 L13 L14 L15 L16 L17 L18  L19 L20
     S1 G20 G15 G55 G12 G30 G11 G24 G66  G12  G55 G66  G5 G86 G54 G47   0 G63 G76 G100 G32
