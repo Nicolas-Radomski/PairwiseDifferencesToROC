@@ -39,7 +39,7 @@ if (length(args)!=2) {
 ## G stands for genotype (i.e. data): n= 240
 ## 0 stands dor missing data
 ## read dataframe of profiles (i.e. Profiles.csv) with missing data (encoded 0)
-dfpm <- read.table("Profiles.csv", dec = ".", header=TRUE, sep = ",", quote = "")
+dfpm <- read.table(args[1], dec = ".", header=TRUE, sep = ",", quote = "")
 ## make sure that each variable of the dataframe is a character
 dfpm <- data.frame(lapply(dfpm, as.character))
 ## replace missing data encoded 0 with NA
